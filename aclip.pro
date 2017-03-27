@@ -12,9 +12,10 @@ TARGET = aclip
 TEMPLATE = app
 
 
-SOURCES += main.cpp\
-        mainwindow.cpp
+SOURCES += \
+    main.cpp\
+    clipwindow.cpp \
 
-HEADERS  += mainwindow.h
 
-FORMS    += mainwindow.ui
+HEADERS  += \
+    clipwindow.h
