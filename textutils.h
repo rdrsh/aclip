@@ -1,54 +1,7 @@
 #pragma once
 
-#include <QMimeData>
-#include "htmlchunks.h"
-
-class PluginTextLen {
-protected:
-    HtmlChunks *pHtmlChunks_;
-    int maxTextLen_;
-
+class TxtUt {
 public:
-    PluginTextLen(HtmlChunks *pHtmlChunks, int maxTextLen) : pHtmlChunks_(pHtmlChunks), maxTextLen_(maxTextLen) {
-    }
-
-    bool addMimeData(const QMimeData *pMimeData) {
-        QString s = pMimeData->text();
-        if (s.size() == 0 || s.size() > maxTextLen_) {
-            return false;
-        }
-        return addText(s);
-    }
-
-    virtual bool addText(const QString &s) {
-        pHtmlChunks_->addText(s);
-        return true;
-    }
-};
-
-class PluginInt : public PluginTextLen {
-public:
-    PluginInt(HtmlChunks *pHtmlChunks) : PluginTextLen(pHtmlChunks, 32) {
-    }
-
-    bool addText(const QString &s) override {
-        QString s2 = s.simplified().replace(' ', "");
-        bool ok;
-        int n = s2.toInt(&ok);
-        return ok ? addInt(n) : false;
-    }
-
-    bool addInt(int n) {
-        pHtmlChunks_->addHtml(allHtml(n));
-        return true;
-    }
-
-    static QString allHtml(int n) {
-        return QString("%1<br>\n%2").arg(currencyHtml(n)).arg(feetHtml(n));
-//        .arg(intToColoredHtml(n))
-
-    }
-
     static QString zeroPad3(int n) {
         if (n < 10) return QString("00%1").arg(n);
         if (n < 100) return QString("0%1").arg(n);
@@ -56,7 +9,6 @@ public:
     }
 
     static QString intToColoredHtml(int n) {
-//        return QString::number(n);
         QString html;
         for (int i = 0; n; ++i) {
             int d = n % 1000;
@@ -83,7 +35,31 @@ public:
     static QString feetHtml(int n) {
         QString feet = intToColoredHtml(n);
         QString meters = intToColoredHtml((1./0.3048)*n);
-        QString belRusUsd = QString("%1 feet = %2 m").arg(feet).arg(meters);
+        QString belRusUsd = QString("%1 ft = %2 m").arg(feet).arg(meters);
         return belRusUsd;
+    }
+
+#define S1 QString("qwertyuiop[] asdfghjkl;' zxcvbnm,./ ` QWERTYUIOP{} |ZXCVBNM<>? ~!@#$%^&*()_+ ASDFGHJKL:\"|")
+#define S2 QString("йцукенгшщзхъ фывапролджэ ячсмитьбю. ё ЙЦУКЕНГШЩЗХЪ /ЯЧСМИТЬБЮ, Ё!\"№;%:?*()_+ ФЫВАПРОЛДЖЭ/")
+
+    static QString qwerty(const QString &s) {
+        static QString s1 = S1+S2;
+        static QString s2 = S2+S1;
+        return strTranslate(s, s1, s2);
+    }
+
+    static QString strTranslate(const QString &s, const QString &sFrom, const QString &sTo) {
+        QString result;
+        for (int i = 0, l = s.size(); i < l; ++i) {
+            QChar ch = s[i];
+            int j = sFrom.indexOf(ch);
+//            if (j >= 0) s[i] = sTo[j];
+            result += j >= 0 ? sTo[j] : ch;
+        }
+        return result;
+    }
+
+    static bool isSingleLine(const QString &s, int maxLen = 64) {
+        return s.size() <= maxLen && s.indexOf("\n") == -1 && s.indexOf("\r") == -1;
     }
 };

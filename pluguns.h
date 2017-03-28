@@ -1,67 +1,66 @@
 #pragma once
 
-#include <algorithm>
-#include <QTextEdit>
-#include <QShortcut>
+#include <QMimeData>
+#include "htmlchunks.h"
+#include "textutils.h"
 
-class HtmlChunks : public QTextEdit {
-//    Q_OBJECT
-
-private:
-    int lenLimit_;
-    bool ascending_;
-    QStringList lst_;
+class PluginTextLen {
+protected:
+    HtmlChunks *pHtmlChunks_;
+    int maxTextLen_;
 
 public:
-    HtmlChunks(int lenLimit, bool ascending = true, QWidget *parent = nullptr) : QTextEdit(parent), lenLimit_(lenLimit), ascending_(ascending) {
-        setReadOnly(true);
-        QShortcut *sh1 = new QShortcut(Qt::Key_F3, this);
-        connect(sh1, &QShortcut::activated, this, &HtmlChunks::switchOrder);
+    PluginTextLen(HtmlChunks *pHtmlChunks, int maxTextLen) : pHtmlChunks_(pHtmlChunks), maxTextLen_(maxTextLen) {}
+
+    bool addMimeData(const QMimeData *pMimeData) {
+        QString s = pMimeData->text();
+        if (s.size() == 0 || s.size() > maxTextLen_) {
+            return false;
+        }
+        return addText(s);
     }
 
-    void addHtml(const QString &html) {
-        if (lst_.size() >= lenLimit_) {
-            lst_.removeFirst();
-        }
-        lst_.push_back(html);
-        update();
+    virtual bool addText(const QString &s) {
+        pHtmlChunks_->addText(s);
+        return true;
+    }
+};
+
+class PluginQwerty : public PluginTextLen {
+public:
+    PluginQwerty(HtmlChunks *pHtmlChunks) : PluginTextLen(pHtmlChunks, 32) {}
+
+    bool addText(const QString &s) override {
+//        if (!TxtUt::isSingleLine(s)) return false;
+        QString qwe = TxtUt::qwerty(s);
+        if (s == qwe) return false;
+        pHtmlChunks_->addText(qwe);
+        return true;
     }
 
-    void addText(const QString &text) {
-        addHtml(text.toHtmlEscaped());
+};
+
+class PluginInt : public PluginTextLen {
+public:
+    PluginInt(HtmlChunks *pHtmlChunks) : PluginTextLen(pHtmlChunks, 32) {
     }
 
-    void update() {
-        if (lst_.empty()) {
-            setHtml("");
-            return;
-        }
-
-        QString html;
-        QString sep;
-        QString hr("\n<hr>\n");
-
-        int i = 0, i2 = lst_.size()-1, delta = 1;
-        if (!ascending_) {
-            std::swap(i, i2);
-            delta = -1;
-        }
-
-        while (true) {
-            html += sep;
-            html += lst_.at(i);
-            sep = hr;
-            if (i == i2) {
-                break;
-            }
-            i += delta;
-        }
-        setHtml(html);
+    bool addText(const QString &s) override {
+        QString s2 = s.simplified().replace(' ', "");
+        bool ok;
+        int n = s2.toInt(&ok);
+        return ok ? addInt(n) : false;
     }
 
-public slots:
-    void switchOrder() {
-        ascending_ = !ascending_;
-        update();
+    bool addInt(int n) {
+        pHtmlChunks_->addHtml(allHtml(n));
+        return true;
+    }
+
+    static QString allHtml(int n) {
+//        .arg(intToColoredHtml(n))
+        QString curr = TxtUt::currencyHtml(n);
+        QString ft = TxtUt::feetHtml(n);
+        return QString("%1<br>\n%2").arg(curr).arg(ft);
     }
 };

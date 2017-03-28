@@ -13,9 +13,13 @@ TEMPLATE = app
 
 
 SOURCES += \
-    main.cpp\
-    clipwindow.cpp \
+    main.cpp
 
 
 HEADERS  += \
-    clipwindow.h
+    clipwindow.h \
+    icorender.h \
+    htmlchunks.h \
+    pluguns.h \
+    widgut.h \
+    textutils.h

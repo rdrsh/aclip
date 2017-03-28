@@ -1,11 +1,33 @@
-#include "clipwindow.h"
 #include <QApplication>
+#include <QSystemTrayIcon>
+#include <QMessageBox>
+#include "icorender.h"
+#include "clipwindow.h"
+#include "widgut.h"
 
-int main(int argc, char *argv[])
-{
+QString _(const char *s) {
+    return QObject::tr(s);
+}
+
+int main(int argc, char *argv[]) {
     QApplication a(argc, argv);
+
+    if (!QSystemTrayIcon::isSystemTrayAvailable()) {
+        QMessageBox::critical(0, _("Systray"), _("I couldn't detect any system tray on this system."));
+        return 1;
+    }
+    QApplication::setQuitOnLastWindowClosed(false);
+
     ClipWindow w;
-    w.show();
+    WidgetUt(w).title("AClip").resizePerc(0.4, 0.7).bottomRight().top().show().esc();
+    w.createTrayIcon();
+
+//    QMimeData m;
+//    m.setText("10000000");
+//    w.addMime(&m);
+
+    IcoRender icoRend;
+    w.setWindowIcon(icoRend.text("AC"));
 
     return a.exec();
 }

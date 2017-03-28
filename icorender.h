@@ -1,11 +1,22 @@
-#ifndef ICO_H
-#define ICO_H
+#pragma once
 
+#include <QPainter>
+#include <QIcon>
 
-class Ico
-{
+class IcoRender {
+    QSize size_;
+    QFont font_;
+    QTextOption textOpts;
+
 public:
-    Ico();
-};
+    IcoRender() : size_(64, 64), font_("Arial", 40), textOpts(Qt::AlignCenter | Qt::AlignVCenter) {}
 
-#endif // ICO_H
+    QIcon text(const QString &s) {
+        QPixmap pix(size_);
+        pix.fill();
+        QPainter painter(&pix);
+        painter.setFont(font_);
+        painter.drawText(pix.rect(), s,  textOpts);
+        return QIcon(pix);
+    }
+};
