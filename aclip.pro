@@ -4,7 +4,8 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+CONFIG  += c++11
+QT      += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -16,7 +17,7 @@ SOURCES += \
     main.cpp
 
 
-HEADERS  += \
+HEADERS += \
     clipwindow.h \
     icorender.h \
     htmlchunks.h \
