@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
     QApplication::setQuitOnLastWindowClosed(false);
 
     ClipWindow w;
-    WidgetUt(w).title("AClip").resizePerc(0.4, 0.7).bottomRight().top().show().esc();
+    WidgetUt(w).title("AClip").resizePerc(0.4, 0.7).bottomRight().top().esc();
     w.createTrayIcon();
 
 //    QMimeData m;
