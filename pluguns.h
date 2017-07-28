@@ -21,6 +21,7 @@ public:
     }
 
     virtual bool addText(const QString &s) {
+        pHtmlChunks_->delText(s);
         pHtmlChunks_->addText(s);
         return true;
     }

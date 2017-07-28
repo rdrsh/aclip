@@ -42,6 +42,9 @@ public:
 
     void addText(const QString &text) { addHtml(preTag(text)); }
 
+    void delHtml(const QString &html) { lst_.removeAll(html); }
+    void delText(const QString &text) { delHtml(preTag(text)); }
+
     void update() {
         QString html = styleTag(css_);
         if (lst_.isEmpty()) {
