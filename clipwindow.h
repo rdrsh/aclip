@@ -11,7 +11,9 @@
 #include <QMessageBox>
 #include "icorender.h"
 #include "htmlchunks.h"
+//#include "strplayer.h"
 #include "pluguns.h"
+#include "widg_vplayer.h"
 
 class TrayMenu : public QMenu {
     QMainWindow *mainWin_;
@@ -54,6 +56,7 @@ private:
     TrayMenu *pTrayMenu_;
     QTabWidget *pTabs_;
     HtmlChunks *pEd1_, *pEd2_, *pEd3_;
+    WidgVPlayer *pPlay_;
     QClipboard *pClip_;
 
 public:
@@ -63,7 +66,9 @@ public:
         pEd1_ = new HtmlChunks(10);
         pEd2_ = new HtmlChunks(10);
         pEd3_ = new HtmlChunks(10);
+        pPlay_ = new WidgVPlayer();
 
+        pTabs_->addTab(pPlay_, "voice");
         pTabs_->addTab(pEd1_, "txt");
         pTabs_->addTab(pEd2_, "num");
         pTabs_->addTab(pEd3_, "qwe");
@@ -134,6 +139,8 @@ public:
         p2.addMimeData(pMimeData);
         PluginQwerty p3(pEd3_);
         p3.addMimeData(pMimeData);
+        PluginVoice p4(pPlay_);
+        p4.addMimeData(pMimeData);
     }
 
 public slots:
